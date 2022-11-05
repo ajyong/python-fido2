@@ -69,8 +69,9 @@ def register_begin():
             display_name="A. User",
         ),
         credentials,
-        user_verification="discouraged",
-        authenticator_attachment="cross-platform",
+        authenticator_attachment="platform",
+        user_verification="required",
+        resident_key_requirement="required",
     )
 
     session["state"] = state
