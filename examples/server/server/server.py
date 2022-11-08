@@ -33,6 +33,8 @@ See the file README.adoc in this directory for details.
 
 Navigate to https://localhost:5000 in a supported web browser.
 """
+from pprint import pprint
+
 from fido2.webauthn import PublicKeyCredentialRpEntity, PublicKeyCredentialUserEntity
 from fido2.server import Fido2Server
 from flask import Flask, session, request, redirect, abort, jsonify
@@ -76,7 +78,9 @@ def register_begin():
 
     session["state"] = state
     print("\n\n\n\n")
-    print(options)
+
+    pprint(options)
+
     print("\n\n\n\n")
 
     return jsonify(dict(options))
@@ -85,11 +89,21 @@ def register_begin():
 @app.route("/api/register/complete", methods=["POST"])
 def register_complete():
     response = request.json
-    print("RegistrationResponse:", response)
+
+    print("======================")
+    print("RegistrationResponse:")
+
+    pprint(response)
+
     auth_data = server.register_complete(session["state"], response)
 
     credentials.append(auth_data.credential_data)
-    print("REGISTERED CREDENTIAL:", auth_data.credential_data)
+
+    print("======================")
+    print("REGISTERED CREDENTIAL:")
+
+    pprint(auth_data.credential_data)
+
     return jsonify({"status": "OK"})
 
 
@@ -110,19 +124,25 @@ def authenticate_complete():
         abort(404)
 
     response = request.json
-    print("AuthenticationResponse:", response)
+
+    print("======================")
+    print("AuthenticationResponse:")
+
+    pprint(response)
+
     server.authenticate_complete(
         session.pop("state"),
         credentials,
         response,
     )
+
     print("ASSERTION OK")
     return jsonify({"status": "OK"})
 
 
 def main():
     print(__doc__)
-    app.run(ssl_context="adhoc", debug=False)
+    app.run(ssl_context="adhoc", debug=False, port=5001)
 
 
 if __name__ == "__main__":
